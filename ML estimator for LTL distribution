@@ -1,0 +1,62 @@
+
+
+# -------------------
+# Score functions ---
+# -------------------
+
+scoreFun <- function(p,x,b){
+  aa = p[1] 
+  bb = p[2]
+  pp = pTL(x,bb,b)
+    c(F1 = sum(pp)
+           -sum((1-pp)/(1-log(aa)*(1-pp))),
+      F2 = length(x)/bb
+           +sum(log(1-(1-x/b)^2))
+           +log(aa)*sum(pp*log(1-(1-x/b)^2))
+           +log(aa)*sum(pp*log(1-(1-x/b)^2)/(1-log(aa)*(1-pp)))
+     )
+}
+
+# -------------------------------
+# Observed information matrix ---
+# -------------------------------
+
+oimatrix <- function(a,b,c,x){
+    pp = pTL(x,b,c)
+   d11 = -1/a^2*sum(pp)
+         +1/a^2*sum((1-pp)/(1-log(a)*(1-pp)))
+         -1/a^2*sum((1-pp)^2/(1-log(a)*(1-pp))^2)
+   d12 =  1/a*sum(pp*log(1-(1-x/c)^2))
+         +1/a*sum(pp*log(1-(1-x/c)^2)/(1-log(a)*(1-pp)))
+          +log(a)/a*sum(pp*log(1-(1-x/c)^2)*(1-pp)/(1-log(a)*(1-pp))^2)
+   d21 = d12
+   d22 = -length(x)/b^2
+         +log(a)*sum(pp*log(1-(1-x/c)^2)^2)
+         +log(a)*sum(pp*log(1-(1-x/c)^2)^2/(1-log(a)*(1-pp)))
+         -log(a)^2*sum(pp^2*log(1-(1-x/c)^2)^2/(1-log(a)*(1-pp))^2)
+     matrix(c(d11,d12,d21,d22),2,2,byrow=T)
+}
+
+# ---------------------------------
+# Standard error of parameter b ---
+# ---------------------------------
+
+dmax <- function(x,alpha,beta,b,n){
+  n*dLTL(x,alpha,beta,b)*(pLTL(x,alpha,beta,b))^{n-1}
+}
+
+mom <- function(r,alpha,beta,b,n){
+  m = length(t)
+  f = rep(0,m)
+  for(i in 1:m){
+    f[i] = integrate(function(r,x,alpha,beta,b,n){x^r*dmax(x,alpha,beta,b,n)},
+             lower=0,upper=b,alpha=alpha,beta=beta,b=b,n=n,r=r[i])$value
+  }
+  return(f)
+}
+
+se.b <- function(alpha,beta,b,n){
+  m1 = mom(1,alpha,beta,b,n)
+  m2 = mom(2,alpha,beta,b,n)
+    sqrt(m2-m1^2)
+}
