@@ -1,4 +1,5 @@
-
+# The following files must be computed in advance:
+# 1. TL and LTL distributions
 
 # -------------------
 # Score functions ---
