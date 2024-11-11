@@ -4,6 +4,10 @@
 
 library(lamW) # Package required to compute the principal branch of the Lambert W function.
 
+# alpha is a shape paramter (induced by Lambert-F generator)
+# beta is a shape parameter
+# q scale parameter (support delimiter parameter)
+
 pTL <- function(x,beta,b){
   (1-(1-x/b)^2)^{beta}
 }
