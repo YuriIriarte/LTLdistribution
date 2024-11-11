@@ -1,0 +1,79 @@
+# 2D graphics ---
+# ---
+
+int <- function(r,a,b){
+  n=length(b)
+  f=rep(0,n)
+  for (i in 1:n){
+    f[i]=integrate(function(u,r,a,b){
+           (1-sqrt(1-u^{1/b}))^r*a^u*(1-log(a)*(1-u))},
+             lower=0,upper=1,r=r,a=a,b=b[i])$value
+  }
+  return(f)
+}
+
+skewnessLTL <- function(a,b){
+  (int(3,a,b)-3*int(1,a,b)*int(2,a,b)+2*int(1,a,b)^3)/(int(2,a,b)-int(1,a,b)^2)^(3/2)
+}
+
+kurtosisLTL <- function(a,b){
+  (int(4,a,b)-4*int(1,a,b)*int(3,a,b)+6*int(1,a,b)^2*int(2,a,b)-3*int(1,a,b)^4)/(int(2,a,b)-int(1,a,b)^2)^2
+}
+
+a <- 1
+curve(skewnessLTL(a,x),0,5,lwd=2,ylim=c(-1,10),xlab=expression(beta),ylab="Skewness",cex.lab=1.3)
+a <- 0.1
+curve(skewnessLTL(a,x),add=TRUE,lty=2,col="red",lwd=2)
+a <- 0.5
+curve(skewnessLTL(a,x),add=TRUE,lty=3,col="blue",lwd=2)
+a <- 1.5
+curve(skewnessLTL(a,x),add=TRUE,lty=3,col="green",lwd=2)
+a <- 2
+curve(skewnessLTL(a,x),add=TRUE,lty=3,col="orange",lwd=2)
+legend("topright",c("1.0","0.1","0.5","1.5","2.0"),lty=1:5,lwd=2,col=c("black","red","blue","green","orange"),title=expression(alpha),bty="n",cex=1.3)
+
+a <- 1
+curve(kurtosisLTL(a,x),0,5,lwd=2,ylim=c(-2,15),xlab=expression(beta),ylab="Kurtosis",cex.lab=1.3)
+a <- 0.1
+curve(kurtosisLTL(a,x),add=TRUE,lty=2,col="red",lwd=2)
+a <- 0.5
+curve(kurtosisLTL(a,x),add=TRUE,lty=3,col="blue",lwd=2)
+a <- 1.5
+curve(skewnessLTL(a,x),add=TRUE,lty=3,col="green",lwd=2)
+a <- 2
+curve(kurtosisLTL(a,x),add=TRUE,lty=3,col="orange",lwd=2)
+legend("topright",c("1.0","0.1","0.5","1.5","2.0"),lty=1:5,lwd=2,col=c("black","red","blue","green","orange"),title=expression(alpha),bty="n",cex=1.3)
+
+# 3D graphics ---
+# ---
+
+library(plot3D)
+
+int <- function(r,a,b){
+  n=length(b)
+  f=rep(0,n)
+  for (i in 1:n){
+    f[i]=integrate(function(u,r,a,b){
+           (1-sqrt(1-u^{1/b}))^r*a^u*(1-log(a)*(1-u))},
+             lower=0,upper=1,r=r,a=a[i],b=b[i])$value
+  }
+  return(f)
+}
+
+skewnessLTL <- function(a,b){
+  (int(3,a,b)-3*int(1,a,b)*int(2,a,b)+2*int(1,a,b)^3)/(int(2,a,b)-int(1,a,b)^2)^(3/2)
+}
+
+kurtosisLTL <- function(a,b){
+  (int(4,a,b)-4*int(1,a,b)*int(3,a,b)+6*int(1,a,b)^2*int(2,a,b)-3*int(1,a,b)^4)/(int(2,a,b)-int(1,a,b)^2)^2
+}
+
+x <- seq(0.1,exp(1),length=20)
+y <- seq(0.1,5,length=20)
+z1=outer(x,y,function(x,y){skewnessLTL(x,y)})
+persp3D(x, y, z1, xlab="ALPHA", ylab="BETA", zlab="SKEWNESS", facets = FALSE, colkey=FALSE, ticktype="detailed", d=95, theta=150, phi=10, resfac=1, bty="f")
+
+x <- seq(0.2,exp(1),length=20)
+y <- seq(0.4,5,length=20)
+z1=outer(x,y,function(x,y){kurtosisLTL(x,y)})
+persp3D(x, y, z1, xlab="ALPHA", ylab="BETA", zlab="KURTOSIS", facets = FALSE, colkey=FALSE, ticktype="detailed", d=95, theta=120, phi=10, resfac=1, bty="f")
