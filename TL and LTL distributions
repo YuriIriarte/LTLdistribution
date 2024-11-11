@@ -1,0 +1,40 @@
+# -----------------------------------------------------------------------------
+# PDF, CDF y QF of the Topp-Leone (TL) and Lambert-Topp-Leone distributions ---
+# -----------------------------------------------------------------------------
+
+library(lamW) # Package required to compute the principal branch of the Lambert W function.
+
+pTL <- function(x,beta,b){
+  (1-(1-x/b)^2)^{beta}
+}
+
+qTL <- function(p,beta,b){
+  b*(1-sqrt(1-p^{1/beta}))
+}
+
+dTL <- function(x,beta,b){
+  2*beta/b*(1-x/b)*(1-(1-x/b)^2)^{beta-1}
+}
+
+pLTL <- function(x,alpha,beta,b){
+  1-(1-pTL(x,beta,b))*alpha^{pTL(x,beta,b)}
+}
+
+qLTL <- function(p,alpha,beta,b){
+  n = length(p)
+  f = numeric(n)
+  for(i in 1:n){
+    f[i] = if(alpha==1){
+             qTL(p[i],beta,b)
+           }else{
+             pp = 1/log(alpha)*lambertW0(log(alpha)*(p[i]-1)/alpha)+1
+             qTL(pp,beta,b)
+           }
+  }
+  return(f)
+}
+
+dLTL <- function(x,alpha,beta,b){
+  dTL(x,beta,b)*alpha^{pTL(x,beta,b)}*(1-log(alpha)*(1-pTL(x,beta,b)))
+}
+
