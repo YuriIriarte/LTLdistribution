@@ -1,0 +1,68 @@
+library(VGAM) # Package required to compute the Birnbaum-Saunders distribution
+
+# ------------------------------------------------------------------------------------------------------------
+# CDF and PDF of the Generalized exponential, Generalized Rayleigh, Rayleigh and exponential distributions ---
+# ------------------------------------------------------------------------------------------------------------
+
+# We use dbisa() and dweibull() to compute the PDF of the Birbaum-Saunders and Weibull distributions
+
+dGE <- function(x,alpha,lambda){
+  alpha/lambda*exp(-x/lambda)*(1-exp(-x/lambda))^{alpha-1}
+}
+
+pGE <- function(x,alpha,lambda){
+  (1-exp(-x/lambda))^{alpha}
+}
+
+pGR <- function(x,alpha,lambda){
+  (1-exp(-(x/lambda)^2))^{alpha}
+}
+
+dGR <- function(x,alpha,lambda){
+  2*alpha/lambda^2*x*exp(-(x/lambda)^2)*(1-exp(-(x/lambda)^2))^{alpha-1}
+}
+
+pR <- function(x,sigma){
+  1-exp(-x^2/(2*sigma^2))
+}
+
+dR <- function(x,sigma){
+  x/sigma^2*exp(-x^2/(2*sigma^2))
+}
+
+pE <- function(x,lambda){
+  pexp(x,1/lambda)
+}
+
+dE <- function(x,lambda){
+  dexp(x,1/lambda)
+}
+
+# ---------------------------
+# log-likelihood functions ---
+# ---------------------------
+
+loglikW <- function(p,x){
+  -sum(log(dweibull(x,shape=p[1],scale=p[2])))
+}
+
+loglikGE <- function(p,x){
+  -sum(log(dGE(x,p[1],p[2])))
+}
+
+loglikBS <- function(p,x){
+  -sum(log(dbisa(x,shape=p[1],scale=p[2])))
+}
+
+loglikGR <- function(p,x){
+  -sum(log(dGR(x,p[1],p[2])))
+}
+
+loglikE <- function(p,x){
+  -sum(log(dexp(x,1/p)))
+}
+
+loglikR <- function(p,x){
+  -sum(log(dR(x,p)))
+}
+
