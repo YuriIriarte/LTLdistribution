@@ -1,5 +1,7 @@
 #The following files must be run beforehand:
-# 1. 
+# 1. TL and LTL distributions
+# 2. ML estimator for LTL distribution
+# 3. Some conventional distributions
 
 # ---------------------
 # fatigue life data ---
