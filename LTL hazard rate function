@@ -1,4 +1,4 @@
-# El siguiente archivo debe calcularse de antemano: distribuciones TL y LTL.
+# The following file must be computed in advance: TL and LTL distributions. 
 
 hLTL <- function(x,alpha,beta,b){
   dLTL(x,alpha,beta,b)/(1-pLTL(x,alpha,beta,b))
