@@ -1,0 +1,120 @@
+# ---------------------
+# fatigue life data ---
+# ---------------------
+
+x <- scan()
+70 90 96 97 99 100 103 104 104 105 107 108 108 108 109
+109 112 112 113 114 114 114 116 119 120 120 120 121 121 123
+124 124 124 124 124 128 128 129 129 130 130 130 131 131 131
+131 131 132 132 132 133 134 134 134 134 134 136 136 137 138
+138 138 139 139 141 141 142 142 142 142 142 142 144 144 145
+146 148 148 149 151 151 152 155 156 157 157 157 157 158 159
+162 163 163 164 166 166 168 170 174 196 212
+
+# -----------
+# LTL fit ---
+# -----------
+
+scoreFun2 <- function(p)scoreFun(p,x,max(x))
+multiroot(scoreFun2, c(0.07,11))# 0.1716633 -27.6741389
+
+m <- oimatrix(0.0277413,12.9645805,max(x),x)
+sqrt(diag(-solve(m)))# 0.007319216 1.538592394
+
+b <- max(x)#212
+se.b(0.0277413,12.9645805,212,101)#8.769386
+
+# -------------------------------
+# W, GE, BS, GR, R and E fits ---
+# -------------------------------
+
+fit <- optim(par=c(2,20),fn=loglikW,method=c("BFGS"),hessian=TRUE,x=x)
+fit$par # 6.073303 143.164800
+fit$value# 462.3146
+fit$converge # 0
+sqrt(diag(solve(fit$hessian))) # 0.4228344 2.4852054
+
+fit <- optim(par=c(3,100),fn=loglikGE,method=c("L-BFGS-B"),hessian=TRUE,x=x)
+fit$par # 281.26311  21.77151
+fit$value# 462.6115
+fit$converge # 0
+sqrt(diag(solve(fit$hessian))) # 106.094547   1.534917
+
+fit <- optim(par=c(3,100),fn=loglikBS,method=c("BFGS"),hessian=TRUE,x=x)
+fit$par # 0.1703875 131.8185880
+fit$value# 457.2705
+fit$converge # 0
+sqrt(diag(solve(fit$hessian))) # 0.01198686 2.22675340
+
+fit <- optim(par=c(4,100),fn=loglikGR,method=c("BFGS"),hessian=TRUE,x=x)
+fit$par # 17.52235 73.08800
+fit$value# 457.2705
+fit$converge # 0
+sqrt(diag(solve(fit$hessian))) # 4.074117 2.966932
+
+fit <- optim(par=c(100),fn=loglikR,method=c("BFGS"),hessian=TRUE,x=x)
+fit$par # 95.90885
+fit$value# 529.6509
+fit$converge # 0
+sqrt(diag(solve(fit$hessian))) # 4.775102
+
+fit <- optim(par=c(20),fn=loglikE,method=c("BFGS"),hessian=TRUE,x=x)
+fit$par # 133.7264
+fit$value# 595.4801
+fit$converge # 0
+sqrt(diag(solve(fit$hessian))) # 13.30567
+
+# ----------------------------------
+# Histogram and fitted densities ---
+# ----------------------------------
+
+hist(x,freq=F,nclass=12,col="grey95",xlab="Fatigue life",ylab="Density function",cex.lab=1.3,main="")
+alpha <- 0.0277413 
+beta <- 12.9645805
+b <- max(x)
+curve(dLTL(x,alpha,beta,b),add=TRUE,xlim=c(1e-12,max(x)),lwd=2)
+alpha <- 6.073303 
+beta <- 143.164800
+curve(dweibull(x,alpha,beta),add=TRUE,lty=3,col="red",lwd=2)
+alpha <- 281.26311  
+lambda <- 21.77151
+curve(dGE(x,alpha,lambda),add=TRUE,lty=3,col="blue",lwd=2)
+alpha <- 0.1703875 
+beta <- 131.8185880
+curve(dbisa(x,shape=alpha,scale=beta),add=TRUE,lty=3,col="orange",lwd=2)
+alpha <- 17.52235 
+lambda <- 73.08800
+curve(dGR(x,alpha,lambda),add=TRUE,lty=3,col="yellow",lwd=2)
+sigma <- 95.908
+curve(dR(x,sigma),add=TRUE,lty=3,col="cyan",lwd=2)
+lambda <- 133.7264
+curve(1/lambda*exp(-x/lambda),add=TRUE,lty=3,col="green",lwd=2) 
+box()
+legend("topright",c("LTL","W","GE","BS","GR","R","E"),lty=c(1,3,3,3,3,3,3),lwd=2,col=c("black","red","blue","orange","yellow","cyan","green"),bty="n")
+
+# -------------------------
+# Goodness of fit tests ---
+# -------------------------
+
+library(goftest)
+
+cvm.test(x, "pLTL", alpha=0.0277413, beta=12.9645805, b=212)
+#omega2 = 0.043251, p-value = 0.9167
+
+cvm.test(x, "pweibull", shape=6.073303, scale=143.164800)
+#omega2 = 0.17963, p-value = 0.311
+
+cvm.test(x, "pEE", alpha=281.26311, lambda=21.77151)
+#omega2 = 0.22388, p-value = 0.2257
+
+cvm.test(x, "pbisa", shape=0.1703875, scale=131.8185880)
+#omega2 = 0.085743, p-value = 0.6603
+
+cvm.test(x, "pGR", alpha=17.52235, lambda=73.08800)
+#omega2 = 0.098771, p-value = 0.5918
+
+cvm.test(x, "pR", sigma=95.90885)
+#omega2 = 4.4884, p-value < 2.2e-16
+
+cvm.test(x, "pE", lambda=133.7264)
+#omega2 = 7.0102, p-value < 2.2e-16
