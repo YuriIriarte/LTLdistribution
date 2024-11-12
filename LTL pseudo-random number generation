@@ -1,0 +1,13 @@
+
+
+
+n <- 500
+b <- 5
+alpha <- 0.1
+beta <- 2
+
+u <- runif(n)
+x <- qLTL(u,alpha,beta,b)
+
+hist(x,freq=F,nclass=21)
+curve(dLTL(x,alpha,beta,b),add=TRUE)
