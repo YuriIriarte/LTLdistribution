@@ -1,5 +1,4 @@
-
-
+# The following file must be computed in advance: TL and LTL distributions.
 
 n <- 500
 b <- 5
